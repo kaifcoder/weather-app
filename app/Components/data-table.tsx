@@ -42,6 +42,8 @@ export function DataTable<TData, TValue>({
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const currentPage = 0;
+
   const table = useReactTable({
     data,
     columns,
@@ -65,7 +67,7 @@ export function DataTable<TData, TValue>({
   return (
     <div>
       <Input
-        placeholder="Filter emails..."
+        placeholder="Filter city..."
         value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
         onChange={(event) =>
           table.getColumn("email")?.setFilterValue(event.target.value)
@@ -127,9 +129,14 @@ export function DataTable<TData, TValue>({
         </Table>
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+        <div>
+          <span>
+            Page{" "}
+            <strong>
+              {table.getPageOptions()[currentPage] + 1} of{" "}
+              {table.getPageOptions().length}
+            </strong>{" "}
+          </span>
         </div>
         <div className="space-x-2">
           <Button
