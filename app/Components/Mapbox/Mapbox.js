@@ -41,7 +41,7 @@ function Mapbox() {
 
   return (
     <div className="flex-1 basis-[50%] border rounded-lg">
-      <MapContainer
+      {typeof window !== "undefined" && <MapContainer
         center={[activeCityCords.lat, activeCityCords.lon]}
         zoom={13}
         scrollWheelZoom={false}
@@ -54,7 +54,7 @@ function Mapbox() {
         />
 
         <FlyToActiveCity activeCityCords={activeCityCords} />
-      </MapContainer>
+      </MapContainer>}
     </div>
   );
 }
