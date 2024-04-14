@@ -25,6 +25,9 @@ import React from "react";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { useGlobalContextUpdate } from "../context/globalContext";
+import Link from "next/link";
+import { CityWeatherTable } from "../utils/city_columns";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -63,14 +66,17 @@ export function DataTable<TData, TValue>({
     },
   });
   const router = useRouter();
+  const { setActiveCityCoords } = useGlobalContextUpdate();
 
   return (
     <div>
       <Input
         placeholder="Filter city..."
-        value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+        value={
+          (table.getColumn("ascii_name")?.getFilterValue() as string) ?? ""
+        }
         onChange={(event) =>
-          table.getColumn("email")?.setFilterValue(event.target.value)
+          table.getColumn("ascii_name")?.setFilterValue(event.target.value)
         }
         className="max-w-sm"
       />
@@ -101,6 +107,7 @@ export function DataTable<TData, TValue>({
                   className="cursor-pointer"
                   onClick={() => {
                     router.push(`/weather`);
+                    setActiveCityCoords([row.original.lat, row.original.lon]);
                   }}
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}

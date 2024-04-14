@@ -13,13 +13,6 @@ export type CityWeatherTable = {
   lat: number;
 };
 
-const data = {
-  city: "Charkh",
-  country: "Afghanistan",
-  timezone: "Asia/Kabul",
-  coordinates: { lon: 68.93749, lat: 33.79712 },
-};
-
 export const citycolumns: ColumnDef<CityWeatherTable>[] = [
   {
     accessorKey: "ascii_name",
