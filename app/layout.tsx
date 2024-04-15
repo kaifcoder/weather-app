@@ -7,7 +7,7 @@ import Navbar from "./Components/Navbar";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Wwweather",
+  title: "Weather application",
   description: "A weather app built with Next.js and TailwindCSS",
 };
 

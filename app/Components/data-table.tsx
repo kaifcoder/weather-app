@@ -26,12 +26,10 @@ import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useGlobalContextUpdate } from "../context/globalContext";
-import Link from "next/link";
-import { CityWeatherTable } from "../utils/city_columns";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
-  data: TData[];
+  data: TData[] | any[];
 }
 
 export function DataTable<TData, TValue>({
@@ -107,6 +105,7 @@ export function DataTable<TData, TValue>({
                   className="cursor-pointer"
                   onClick={() => {
                     router.push(`/weather`);
+
                     setActiveCityCoords([row.original.lat, row.original.lon]);
                   }}
                   key={row.id}
