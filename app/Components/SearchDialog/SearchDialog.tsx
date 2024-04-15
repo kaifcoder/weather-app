@@ -6,7 +6,13 @@ import {
 import { commandIcon } from "@/app/utils/Icons";
 import { Button } from "@/components/ui/button";
 import { Command, CommandInput } from "@/components/ui/command";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 function SearchDialog() {
@@ -14,9 +20,12 @@ function SearchDialog() {
   const { setActiveCityCoords } = useGlobalContextUpdate();
 
   const [hoveredIndex, setHoveredIndex] = React.useState<number>(0);
+  const router = useRouter();
 
   const getClickedCoords = (lat: number, lon: number) => {
     setActiveCityCoords([lat, lon]);
+    // redirect to weather page
+    router.push(`/weather`);
   };
   return (
     <div className="search-btn">
@@ -61,20 +70,22 @@ function SearchDialog() {
                   ) => {
                     const { country, state, name } = item;
                     return (
-                      <li
-                        key={index}
-                        onMouseEnter={() => setHoveredIndex(index)}
-                        className={`py-3 px-2 text-sm  rounded-sm cursor-default
+                      <DialogClose className="w-full  text-start">
+                        <li
+                          key={index}
+                          onMouseEnter={() => setHoveredIndex(index)}
+                          className={`py-3 px-2 text-sm  rounded-sm cursor-default
                         ${hoveredIndex === index ? "bg-accent" : ""}
                       `}
-                        onClick={() => {
-                          getClickedCoords(item.lat, item.lon);
-                        }}
-                      >
-                        <p className=" text">
-                          {name}, {state && state + ","} {country}
-                        </p>
-                      </li>
+                          onClick={() => {
+                            getClickedCoords(item.lat, item.lon);
+                          }}
+                        >
+                          <p className=" text">
+                            {name}, {state && state + ","} {country}
+                          </p>
+                        </li>
+                      </DialogClose>
                     );
                   }
                 )}

@@ -10,14 +10,19 @@ import { useGlobalContext } from "../context/globalContext";
 function Navbar() {
   const router = useRouter();
   const { state } = useGlobalContext();
-  const navigation = usePathname();
 
   return (
     <div className="w-full py-4 flex items-center justify-between">
-      <div className="left"></div>
+      <div className="left">
+        <Button
+          onClick={() => router.push("/")}
+          className="flex items-center gap-2"
+        >
+          <span className="font-bold">Weather App</span>
+        </Button>
+      </div>
       <div className="search-container flex shrink-0 w-full gap-2 sm:w-fit">
-        {navigation === "/weather" && <SearchDialog />}
-
+        <SearchDialog />
         <div className="btn-group flex items-center gap-2">
           <ThemeDropdown />
         </div>

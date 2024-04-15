@@ -3,6 +3,7 @@
 //3 TanStack Libraries!!!
 import {
   ColumnDef,
+  ColumnSort,
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
@@ -18,16 +19,24 @@ import {
   useInfiniteQuery,
 } from "@tanstack/react-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import React from "react";
+import React, { use, useEffect } from "react";
 import { CityWeatherTable } from "../utils/city_columns";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useGlobalContextUpdate } from "../context/globalContext";
+import useGeolocation from "../hooks/useGeolocation";
 
 const fetchSize = 50;
 
 function DataTableScrollComp() {
   //we need a reference to the scrolling element for logic down below
   const tableContainerRef = React.useRef<HTMLDivElement>(null);
+
+  const router = useRouter();
+  useGeolocation();
+
+  const { activeCityCoords, setActiveCityCoords } = useGlobalContextUpdate();
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
 
@@ -78,7 +87,11 @@ function DataTableScrollComp() {
     results: CityWeatherTable[];
   };
 
-  async function getCityData(limit: number = 20, offset: number = 0) {
+  async function getCityData(
+    limit: number = 20,
+    offset: number = 0,
+    sorting: SortingState
+  ) {
     const res = await fetch(
       `https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/geonames-all-cities-with-a-population-1000/records?&limit=${limit}&offset=${offset}&lang=en`
     );
@@ -100,16 +113,36 @@ function DataTableScrollComp() {
       results: transformedData,
     };
     console.log("newResults", newResults);
+    if (sorting.length) {
+      const sort = sorting[0] as ColumnSort;
+      const { id, desc } = sort as {
+        id: keyof CityWeatherTable;
+        desc: boolean;
+      };
+      newResults.results.sort((a: any, b: any) => {
+        if (desc) {
+          return a[id] < b[id] ? 1 : -1;
+        }
+        return a[id] > b[id] ? 1 : -1;
+      });
+    }
     return newResults;
   }
 
   //react-query has a useInfiniteQuery hook that is perfect for this use case
   const { data, fetchNextPage, isFetching, isLoading } =
     useInfiniteQuery<CityApiResponse>({
-      queryKey: ["ascii_name"],
+      queryKey: [
+        "ascii_name",
+        "cou_name_en",
+        "timezone",
+        "lat",
+        "lon",
+        sorting,
+      ],
       queryFn: async ({ pageParam = 0 }) => {
         const start = (pageParam as number) * fetchSize;
-        const fetchedData = await getCityData(fetchSize, start);
+        const fetchedData = await getCityData(fetchSize, start, sorting);
         console.log("fetchedData", fetchedData);
         return fetchedData;
       },
@@ -196,10 +229,12 @@ function DataTableScrollComp() {
   }
 
   return (
-    <div className="app">
-      ({flatData.length} of {totalDBRowCount} rows fetched)
+    <div>
+      <h1 className="text-2xl font-semibold">City Countries Table</h1>
+      <div className="w-full text-end p-2">
+        ({flatData.length} of {totalDBRowCount} rows fetched)
+      </div>
       <div
-        className=""
         onScroll={(e) => fetchMoreOnBottomReached(e.target as HTMLDivElement)}
         ref={tableContainerRef}
         style={{
@@ -275,6 +310,12 @@ function DataTableScrollComp() {
                     position: "absolute",
                     transform: `translateY(${virtualRow.start}px)`, //this should always be a `style` as it changes on scroll
                     width: "100%",
+                  }}
+                  className="cursor-pointer"
+                  onClick={() => {
+                    router.push(`/weather`);
+
+                    setActiveCityCoords([row.original.lat, row.original.lon]);
                   }}
                 >
                   {row.getVisibleCells().map((cell) => {

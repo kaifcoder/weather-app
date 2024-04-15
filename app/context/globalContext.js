@@ -3,7 +3,7 @@
 import axios from "axios";
 import React, { useContext, createContext, useState, useEffect } from "react";
 import defaultStates from "../utils/defaultStates";
-
+import useGeolocation from "../hooks/useGeolocation";
 import { debounce } from "lodash";
 
 const GlobalContext = createContext();
@@ -13,9 +13,8 @@ export const GlobalContextProvider = ({ children }) => {
   const [forecast, setForecast] = useState({});
   const [geoCodedList, setGeoCodedList] = useState(defaultStates);
   const [inputValue, setInputValue] = useState("");
-
   const [activeCityCoords, setActiveCityCoords] = useState([
-    51.752021, -1.257726,
+
   ]);
 
   const [airQuality, setAirQuality] = useState({});
